@@ -1499,6 +1499,7 @@ body.modal-open {
   font-size: 0.85rem;
   line-height: 1.6;
   color: #f0f0f0;
+  white-space: pre-line;
 }
 
 .blog-link {

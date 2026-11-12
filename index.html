@@ -617,7 +617,7 @@
         if (event.key === 'Escape' && !modal.hidden) closeModal();
       });
 
-      const INSTAGRAM_FEED_URL = 'https://feeds.behold.so/ruoIprUVMbUUWyLclydf';
+      const INSTAGRAM_FEED_URL = 'https://feeds.behold.so/l7eDyovnRSdu8xsW532b';
       const INSTAGRAM_PROFILE_URL = 'https://www.instagram.com/prof_saviooliveira/';
       const EXAMPLE_POSTS = [
         {
@@ -696,7 +696,7 @@
           link.target = '_blank';
           link.rel = 'noopener noreferrer';
           link.insertAdjacentHTML('beforeend', '<i class="fa-brands fa-instagram"></i>');
-          content.append(make('p', '', clip(lines.join(' '), 180)), link);
+          content.append(make('p', '', clip(lines.join('\n'), 180)), link);
           back.append(content);
 
           inner.append(front, back);
