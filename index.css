@@ -1378,6 +1378,11 @@ body.modal-open {
   gap: 32px;
 }
 
+.blog-status {
+  grid-column: 1 / -1;
+  color: #6b7280;
+}
+
 .blog-card {
   perspective: 1000px;
   min-height: 360px;

@@ -380,7 +380,9 @@
         <p>Artigos práticos escritos pelos especialistas da Podium.</p>
       </div>
 
-      <div class="blog-grid" id="blog-grid" aria-live="polite"></div>
+      <div class="blog-grid" id="blog-grid" aria-live="polite">
+        <p class="blog-status">Carregando publicações do Instagram...</p>
+      </div>
       <a href="https://www.instagram.com/prof_saviooliveira/" id="blog-profile" target="_blank" rel="noopener noreferrer" class="blog-follow"><i class="fa-brands fa-instagram"></i> Siga a Podium no Instagram</a>
     </div>
   </section>
@@ -615,25 +617,23 @@
         if (event.key === 'Escape' && !modal.hidden) closeModal();
       });
 
-      // Cole aqui a URL do feed JSON do Instagram (ex.: Behold.so ou proxy da Graph API).
-      // Enquanto estiver vazia, são exibidos os posts de exemplo abaixo.
-      const INSTAGRAM_FEED_URL = '';
+      const INSTAGRAM_FEED_URL = 'https://feeds.behold.so/ruoIprUVMbUUWyLclydf';
       const INSTAGRAM_PROFILE_URL = 'https://www.instagram.com/prof_saviooliveira/';
-      const FALLBACK_POSTS = [
+      const EXAMPLE_POSTS = [
         {
-          caption: 'Faturamento não é lucro: 5 erros silenciosos que drenam o caixa das PMEs\nEntenda como corrigir a precificação e o ciclo financeiro para parar de crescer sem geração real de caixa.',
+          caption: 'Faturamento não é lucro: como cuidar do caixa da sua empresa\nEntenda a importância da precificação e do planejamento financeiro.',
           image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=60',
-          permalink: INSTAGRAM_PROFILE_URL, timestamp: ''
+          permalink: INSTAGRAM_PROFILE_URL
         },
         {
-          caption: 'Como tirar o planejamento estratégico do papel e engajar sua liderança\nDesdobre metas trimestrais e crie rituais semanais que mantêm toda a operação na mesma direção.',
+          caption: 'Como tirar o planejamento estratégico do papel\nDefina metas claras e acompanhe os resultados com sua equipe.',
           image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=60',
-          permalink: INSTAGRAM_PROFILE_URL, timestamp: ''
+          permalink: INSTAGRAM_PROFILE_URL
         },
         {
-          caption: 'Posicionamento estratégico: como parar de competir pelo menor preço\nConstrua uma proposta de valor clara para atrair clientes qualificados e elevar seu ticket médio.',
+          caption: 'Posicionamento estratégico: destaque o valor da sua empresa\nConstrua uma proposta de valor para atrair os clientes certos.',
           image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=60',
-          permalink: INSTAGRAM_PROFILE_URL, timestamp: ''
+          permalink: INSTAGRAM_PROFILE_URL
         }
       ];
 
@@ -642,18 +642,26 @@
 
       const normalizePost = post => ({
         caption: post.caption || '',
-        image: post.thumbnailUrl || post.thumbnail_url || post.mediaUrl || post.media_url || post.image || '',
+        image: post.sizes?.medium?.mediaUrl || post.thumbnailUrl || post.thumbnail_url ||
+          (post.mediaType !== 'VIDEO' ? (post.mediaUrl || post.media_url || post.image || '') : ''),
         permalink: post.permalink || INSTAGRAM_PROFILE_URL,
         timestamp: post.timestamp || ''
       });
 
-      const renderPosts = posts => {
+      const renderPosts = (posts, isExample = false) => {
         blogGrid.replaceChildren();
+        if (isExample) {
+          const status = document.createElement('p');
+          status.className = 'blog-status';
+          status.textContent = 'Ainda não há publicações no feed. Veja alguns exemplos enquanto isso.';
+          blogGrid.append(status);
+        }
         posts.slice(0, 6).forEach(post => {
           const lines = post.caption.split('\n').map(line => line.trim()).filter(Boolean);
           const title = clip(lines[0] || 'Novo post da Podium', 90);
           const excerpt = clip(lines.slice(1).join(' ') || '', 140);
-          const date = post.timestamp ? new Date(post.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+          const postDate = new Date(post.timestamp);
+          const date = post.timestamp && !Number.isNaN(postDate.getTime()) ? postDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
 
           const card = document.createElement('div');
           card.className = 'blog-card';
@@ -671,17 +679,19 @@
           const inner = make('div', 'blog-inner');
           const front = make('div', 'blog-face blog-front');
           const meta = make('div', 'blog-meta');
-          meta.append(make('span', '', 'Instagram'), make('span', '', date));
+          meta.append(make('span', '', isExample ? 'Exemplo' : 'Instagram'), make('span', '', date));
           const hint = make('span', 'blog-hint');
-          hint.innerHTML = '<i class="fa-solid fa-rotate"></i> Ver post';
+          hint.innerHTML = isExample
+            ? '<i class="fa-solid fa-rotate"></i> Ver exemplo'
+            : '<i class="fa-solid fa-rotate"></i> Ver post';
           front.append(meta, make('h3', '', title));
           if (excerpt) front.append(make('p', '', excerpt));
           front.append(hint);
 
           const back = make('div', 'blog-face blog-back');
-          if (post.image) back.style.setProperty('--blog-img', 'url("' + encodeURI(post.image).replace(/"/g, '%22') + '")');
+          if (post.image) back.style.setProperty('--blog-img', 'url(' + JSON.stringify(post.image) + ')');
           const content = make('div', 'blog-back-content');
-          const link = make('a', 'blog-link', 'Ver no Instagram ');
+          const link = make('a', 'blog-link', isExample ? 'Visitar perfil no Instagram ' : 'Ver no Instagram ');
           link.href = post.permalink;
           link.target = '_blank';
           link.rel = 'noopener noreferrer';
@@ -711,21 +721,32 @@
         }
       });
 
-      renderPosts(FALLBACK_POSTS);
-      if (INSTAGRAM_FEED_URL) {
-        fetch(INSTAGRAM_FEED_URL)
-          .then(response => response.json())
-          .then(data => {
-            const list = Array.isArray(data) ? data : (data.posts || data.data || []);
-            const posts = list.map(normalizePost).filter(post => post.image && post.caption);
-            if (posts.length) {
-              renderPosts(posts);
-              const profile = list[0] && list[0].username;
-              if (profile) document.getElementById('blog-profile').href = 'https://www.instagram.com/' + profile + '/';
-            }
-          })
-          .catch(() => {});
-      }
+      const showBlogStatus = message => {
+        const status = document.createElement('p');
+        status.className = 'blog-status';
+        status.textContent = message;
+        blogGrid.replaceChildren(status);
+      };
+
+      fetch(INSTAGRAM_FEED_URL)
+        .then(response => {
+          if (!response.ok) throw new Error('Instagram feed returned HTTP ' + response.status);
+          return response.json();
+        })
+        .then(data => {
+          if (!Array.isArray(data.posts)) throw new Error('Invalid Instagram feed response');
+          if (!data.posts.length) {
+            renderPosts(EXAMPLE_POSTS, true);
+            return;
+          }
+          const posts = data.posts.map(normalizePost).filter(post => post.image);
+          if (!posts.length) throw new Error('Instagram feed has no posts with images');
+          renderPosts(posts);
+        })
+        .catch(error => {
+          console.error('Não foi possível carregar o feed do Instagram:', error);
+          showBlogStatus('Não foi possível carregar as publicações. Acesse nosso Instagram para acompanhá-las.');
+        });
 
       document.querySelectorAll('.case-card').forEach(card => {
         const flip = () => {
