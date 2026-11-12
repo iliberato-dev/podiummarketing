@@ -1554,8 +1554,69 @@ body.modal-open {
 /* ================= CONTACT SECTION ================= */
 .contact {
   padding: 120px 0;
-  background-color: #f9f9f9;
-  margin-top: 100px;
+  background-color: #ffffff;
+}
+
+.contact-content {
+  text-align: center;
+}
+
+.contact-content h2 {
+  max-width: 930px;
+  margin: 24px auto;
+  color: #0d0d0d;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.05;
+}
+
+.contact-content p {
+  max-width: 580px;
+  margin: 0 auto;
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.contact-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 36px;
+}
+
+.contact-actions .btn {
+  border-radius: 999px;
+}
+
+.contact-primary {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+.contact-primary:hover {
+  background-color: #a82c20;
+}
+
+.contact-secondary {
+  border: 1px solid #161616;
+  color: #161616;
+}
+
+.contact-secondary:hover {
+  background-color: #161616;
+  color: #ffffff;
+}
+
+.contact-actions .btn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  .contact {
+    padding: 80px 0;
+  }
 }
 
 .contact-grid {
