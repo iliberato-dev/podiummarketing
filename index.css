@@ -214,6 +214,28 @@ a {
   display: none;
 }
 
+.nav-learn-more {
+  display: block;
+}
+
+.nav-learn-more .btn {
+  padding: 8px 20px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+@media (min-width: 769px) {
+  .nav-learn-more {
+    transform: translateX(max(-8px, calc((100vw - 1280px) / 2 - 8px)));
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .nav-links {
+    gap: 14px;
+  }
+}
+
 .menu-toggle {
   display: none;
   width: 44px;
@@ -1365,6 +1387,31 @@ body.modal-open {
   color: #cccccc;
 }
 
+@media (max-width: 768px) {
+  .cta-banner {
+    margin: 0;
+    padding: 40px 20px;
+  }
+
+  .cta-banner h2 {
+    font-size: clamp(1.65rem, 7vw, 2.2rem);
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .cta-banner p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .cta-banner .btn {
+    max-width: 100%;
+    padding: 12px;
+    font-size: 0.75rem;
+  }
+}
+
 /* ================= BLOG SECTION ================= */
 .blog {
   padding: 110px 0;
@@ -1555,6 +1602,7 @@ body.modal-open {
 .contact {
   padding: 120px 0;
   background-color: #ffffff;
+  scroll-margin-top: 85px;
 }
 
 .contact-content {
